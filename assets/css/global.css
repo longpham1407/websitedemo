@@ -1,0 +1,673 @@
+/**
+ * global.css — I Group
+ * Reset, biến màu, typography, header & footer dùng chung toàn site.
+ */
+
+/* ============================================
+   1. Google Fonts (khai báo trong HTML <link>)
+   ============================================ */
+
+/* ============================================
+   2. CSS Variables — Design tokens
+   ============================================ */
+:root {
+  /* Màu thương hiệu */
+  --color-primary: #002d72;
+  --color-primary-dark: #001a3d;
+  --color-accent: #b31f24;
+  --color-accent-hover: #941a1e;
+
+  /* Nền & chữ */
+  --color-bg-page: #eef5ff;
+  --color-bg-white: #ffffff;
+  --color-text: #333333;
+  --color-text-muted: #5c6470;
+  --color-text-inverse: #ffffff;
+
+  /* Viền & bóng */
+  --color-border: #e2e6ec;
+  --shadow-sm: 0 2px 8px rgba(0, 45, 114, 0.06);
+  --shadow-md: 0 8px 24px rgba(0, 26, 61, 0.12);
+
+  /* Typography */
+  --font-family: "Roboto", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-hero: clamp(1.75rem, 4vw, 3rem);
+  --line-height-tight: 1.2;
+  --line-height-normal: 1.6;
+  --line-height-relaxed: 1.75;
+
+  /* Layout */
+  --container-max: 1200px;
+  --header-height: 80px;
+
+  /* Header viên thuốc — dùng chung mọi trang (trùng với hero-shell / page-hero-frame) */
+  --pill-shell-margin-x: clamp(0.65rem, 2.5vw, 1.5rem);
+  /* Lề trên thẻ + khoảng pill fixed: cùng công thức với lề ngang để cân “nổi” với mép trên viewport */
+  --pill-shell-margin-top: var(--pill-shell-margin-x);
+  /* Lề “nửa ngoài” của pill so với viewport (fixed); mặc định = lề thẻ hero — khi cuộn thu gọn riêng ở html.is-pill-compact */
+  --pill-header-gap-x: var(--pill-shell-margin-x);
+  --pill-header-gap-y: var(--pill-shell-margin-top);
+  --pill-bar-inset-x: clamp(12px, 2.5vw, 28px);
+  --pill-bar-inset-y: var(--pill-bar-inset-x);
+  --pill-inner-h: 56px;
+  --pill-inner-py: 0.4rem;
+  --pill-inner-px: clamp(1rem, 2.2vw, 1.65rem);
+  /* Chiều cao vùng nội dung thanh pill (không gồm inset dọc) */
+  --pill-bar-height: calc(var(--pill-inner-h) + (2 * var(--pill-inner-py)));
+  /* Cạnh trên pill fixed so với viewport */
+  --pill-bar-top-fixed: calc(
+    env(safe-area-inset-top, 0px) + var(--pill-header-gap-y) + var(--pill-bar-inset-y)
+  );
+  /* Đáy pill so viewport — trong thẻ hero (margin thẻ = shell, không đổi khi cuộn) */
+  --pill-cleared-in-shell: calc(
+    env(safe-area-inset-top, 0px) + var(--pill-shell-margin-top) + var(--pill-bar-inset-y) + var(--pill-bar-height)
+  );
+  /* Đáy pill so viewport — header fixed (lề ngoài = pill-header-gap, thu khi cuộn) */
+  --pill-cleared-fixed: calc(var(--pill-bar-top-fixed) + var(--pill-bar-height));
+  --pill-content-gap: 12px;
+
+  /* Banner / hero: lấp đầy màn hình đầu (mọi tỷ lệ; trừ lề thẻ + vùng an toàn dưới) */
+  --banner-viewport-min-height: max(
+    300px,
+    calc(100vh - var(--pill-shell-margin-top) - env(safe-area-inset-bottom, 0px))
+  );
+
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-pill: 999px;
+
+  /* Chuyển động */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.25s ease;
+  --z-header: 1000;
+  --z-overlay: 900;
+}
+
+@supports (height: 100svh) {
+  :root {
+    --banner-viewport-min-height: max(
+      300px,
+      calc(100svh - var(--pill-shell-margin-top) - env(safe-area-inset-bottom, 0px))
+    );
+  }
+}
+
+/* Cuộn xuống: thu lề pill (sát mép hơn), thanh thấp hơn — margin thẻ hero-shell giữ nguyên */
+html.is-pill-compact {
+  --pill-header-gap-x: clamp(0.3rem, 1vw, 0.65rem);
+  --pill-header-gap-y: var(--pill-header-gap-x);
+  --pill-bar-inset-x: clamp(6px, 1.2vw, 14px);
+  --pill-bar-inset-y: var(--pill-bar-inset-x);
+  --pill-inner-h: 52px;
+  --pill-inner-py: 0.32rem;
+  --pill-inner-px: clamp(0.75rem, 1.8vw, 1.35rem);
+  --pill-bar-height: calc(var(--pill-inner-h) + (2 * var(--pill-inner-py)));
+  --pill-bar-top-fixed: calc(
+    env(safe-area-inset-top, 0px) + var(--pill-header-gap-y) + var(--pill-bar-inset-y)
+  );
+  --pill-cleared-fixed: calc(var(--pill-bar-top-fixed) + var(--pill-bar-height));
+  --pill-cleared-in-shell: calc(
+    env(safe-area-inset-top, 0px) + var(--pill-shell-margin-top) + var(--pill-bar-inset-y) + var(--pill-bar-height)
+  );
+}
+
+/* ============================================
+   3. Reset / Normalize nhẹ
+   ============================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--color-text);
+  background-color: var(--color-bg-white);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: color var(--transition-fast), opacity var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-accent);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+/* Skip link — truy cập & SEO/UX */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: calc(var(--z-header) + 1);
+  padding: 0.75rem 1rem;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+/* Ẩn nhãn trực quan nhưng vẫn đọc được bởi screen reader */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Container dùng chung */
+.container {
+  width: 100%;
+  max-width: var(--container-max);
+  margin-inline: auto;
+  padding-inline: clamp(1rem, 4vw, 1.5rem);
+}
+
+/* ============================================
+   4. Site Header
+   ============================================ */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  min-height: var(--header-height);
+  background-color: var(--color-bg-white);
+  border-bottom: 1px solid var(--color-border);
+  transition: box-shadow var(--transition-base);
+}
+
+.site-header.is-scrolled {
+  box-shadow: var(--shadow-sm);
+}
+
+/* Header viên thuốc trắng (trong thẻ banner = absolute; trang nền sáng = fixed + lệch ngang giống thẻ hero) */
+.site-header.site-header--floating-pill {
+  position: absolute;
+  top: var(--pill-bar-inset-y);
+  left: var(--pill-bar-inset-x);
+  right: var(--pill-bar-inset-x);
+  z-index: 20;
+  background: #ffffff;
+  border: none;
+  border-radius: 100px;
+  box-shadow: 0 12px 40px rgba(0, 26, 61, 0.16);
+  min-height: 0;
+  transition:
+    top var(--transition-base),
+    left var(--transition-base),
+    right var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.site-header.site-header--floating-pill.site-header--fixed {
+  position: fixed;
+  top: var(--pill-bar-top-fixed);
+  left: calc(var(--pill-header-gap-x) + var(--pill-bar-inset-x));
+  right: calc(var(--pill-header-gap-x) + var(--pill-bar-inset-x));
+  z-index: 1100;
+}
+
+.site-header.site-header--floating-pill.is-scrolled {
+  box-shadow: 0 16px 48px rgba(0, 26, 61, 0.22);
+}
+
+.site-header.site-header--floating-pill .site-header__inner--pill {
+  min-height: var(--pill-inner-h);
+  padding-block: var(--pill-inner-py);
+  padding-inline: var(--pill-inner-px);
+  transition: min-height var(--transition-base), padding var(--transition-base);
+}
+
+.site-nav__link--pill {
+  color: #111827;
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+  font-size: var(--font-size-sm);
+}
+
+.site-nav__link--pill:hover {
+  color: var(--color-accent);
+}
+
+.site-nav__link--pill.is-active {
+  color: #0f172a;
+}
+
+.site-logo--pill {
+  font-size: var(--font-size-base);
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: var(--header-height);
+}
+
+.site-logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: var(--color-primary);
+  letter-spacing: -0.02em;
+}
+
+.site-logo:hover {
+  color: var(--color-primary);
+  opacity: 0.9;
+}
+
+.site-logo__brand {
+  color: var(--color-accent);
+}
+
+/* Nút menu mobile */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+}
+
+.nav-toggle__bar {
+  display: block;
+  width: 22px;
+  height: 2px;
+  margin-inline: auto;
+  background: var(--color-primary);
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.site-header.is-menu-open .nav-toggle__bar:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.site-header.is-menu-open .nav-toggle__bar:nth-child(2) {
+  opacity: 0;
+}
+
+.site-header.is-menu-open .nav-toggle__bar:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Điều hướng chính */
+.site-nav {
+  display: flex;
+  align-items: center;
+}
+
+.site-nav__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: clamp(0.5rem, 2vw, 1.75rem);
+}
+
+.site-nav__link {
+  display: inline-block;
+  padding: 0.35rem 0;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-primary);
+  position: relative;
+}
+
+.site-nav__link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--color-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--transition-fast);
+}
+
+.site-nav__link:hover::after,
+.site-nav__link.is-active::after {
+  transform: scaleX(1);
+}
+
+.site-nav__link.is-active {
+  color: var(--color-primary-dark);
+}
+
+/* ============================================
+   5. Site Footer
+   ============================================ */
+.site-footer {
+  margin-top: auto;
+  background: linear-gradient(180deg, var(--color-primary-dark) 0%, #00152e 100%);
+  color: var(--color-text-inverse);
+  border-top-left-radius: var(--radius-lg);
+  border-top-right-radius: var(--radius-lg);
+  padding-block: clamp(2rem, 5vw, 3rem);
+}
+
+.site-footer a {
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.site-footer a:hover {
+  color: #ffffff;
+}
+
+.site-footer__top {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: start;
+  gap: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.site-footer__logo {
+  font-weight: 700;
+  font-size: var(--font-size-xl);
+  color: #ffffff;
+}
+
+.site-footer__logo:hover {
+  color: #ffffff;
+  opacity: 0.92;
+}
+
+.site-footer__certs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+
+.site-footer__cert-badge {
+  padding: 0.35rem 0.75rem;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.site-footer__middle {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 2rem;
+  padding-block: 1.75rem;
+}
+
+.site-footer__company {
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-relaxed);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.site-footer__company strong {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+  font-size: var(--font-size-base);
+}
+
+.site-footer__aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .site-footer__aside {
+    align-items: flex-end;
+  }
+}
+
+.site-footer__social-label {
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.site-footer__contact-email {
+  margin: 0 0 0.65rem;
+  font-size: var(--font-size-sm);
+}
+
+.site-footer__social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.site-footer__social-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  transition: background var(--transition-fast), border-color var(--transition-fast);
+}
+
+.site-footer__social-link:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+/* Dropdown ngôn ngữ (UI tĩnh, sẵn sàng mở rộng JS) */
+.lang-select {
+  position: relative;
+}
+
+.lang-select__native {
+  appearance: none;
+  -webkit-appearance: none;
+  min-width: 160px;
+  padding: 0.5rem 2.25rem 0.5rem 0.85rem;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+}
+
+.lang-select__native:hover,
+.lang-select__native:focus {
+  outline: none;
+  border-color: #ffffff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.lang-select::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 0;
+  height: 0;
+  margin-top: -3px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 6px solid rgba(255, 255, 255, 0.85);
+  pointer-events: none;
+}
+
+.site-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  font-size: var(--font-size-sm);
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.back-to-top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.back-to-top:hover {
+  color: #ffffff;
+}
+
+/* Nút chung (dùng lại trên nhiều trang) */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border-radius: var(--radius-pill);
+  border: 2px solid transparent;
+  transition: background var(--transition-fast), color var(--transition-fast),
+    border-color var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.btn--primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.btn--primary:hover {
+  background: var(--color-primary-dark);
+  color: var(--color-text-inverse);
+}
+
+.btn--outline-light {
+  background: var(--color-bg-white);
+  color: var(--color-primary);
+  border-color: var(--color-bg-white);
+}
+
+.btn--outline-light:hover {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--color-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Nút Apply / CTA sáng trên nền xanh */
+.btn--apply {
+  background: var(--color-bg-white);
+  color: var(--color-accent);
+  border-color: var(--color-bg-white);
+  font-weight: 700;
+}
+
+.btn--apply:hover {
+  background: rgba(255, 255, 255, 0.94);
+  color: var(--color-accent-hover);
+  transform: translateY(-1px);
+}
+
+.btn__icon {
+  font-size: 1.1em;
+  line-height: 1;
+}
+
+/* Animations */
+@keyframes hero-circle-reveal {
+  0% {
+    clip-path: circle(0% at 100% 100%);
+  }
+  to {
+    clip-path: circle(140% at 100% 100%);
+  }
+}
+
+.animate-hero-circle {
+  will-change: clip-path;
+  animation: 2s ease-out both hero-circle-reveal;
+}
